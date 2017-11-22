@@ -1,0 +1,40 @@
+version: '2'
+services:
+    db:
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_USER: sonar
+            POSTGRES_PASSWORD: password
+        volumes:
+            - ./pgdata/:/var/lib/postgresql/data    
+        networks:
+            - sugarwebnet
+    sonarqube:
+        image: sonarqube
+        restart: always
+        ports:
+            - 9000:9000
+            - 9092:9092
+        environment:
+            SONARQUBE_JDBC_USERNAME: sonar
+            SONARQUBE_JDBC_PASSWORD: password
+            SONARQUBE_JDBC_URL: jdbc:postgresql://db/sonar
+        volumes:
+            - ./sonarqube-data/extensions:/opt/sonarqube/extensions
+        networks:
+            - sugarwebnet
+    jenkins:
+        image: jenkinsci/blueocean
+        user: root
+        ports:
+            - 8081:8080
+        volumes:
+            - ./jenkins_home:/var/jenkins_home:z
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ../:/home/sources
+            - /home/sources/ci
+        networks:
+            - sugarwebnet
+networks:
+    sugarwebnet:

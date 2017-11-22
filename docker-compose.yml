@@ -1,0 +1,42 @@
+version: '2'
+services:
+    db:
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: password1
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+            MYSQL_DATABASE: sonar
+        volumes:
+            - ./dbdata/:/var/lib/mysql
+        networks:
+            - sugarwebnet
+    sonarqube:
+        image: sonarqube
+        restart: always
+        ports:
+            - 9000:9000
+            - 9092:9092
+        environment:
+            SONARQUBE_JDBC_USERNAME: user
+            SONARQUBE_JDBC_PASSWORD: password
+            SONARQUBE_JDBC_URL: jdbc:mysql://db/sonar?useUnicode=true&characterEncoding=utf8
+        volumes:
+            - ./sonarqube-data/extensions:/opt/sonarqube/extensions
+        networks:
+            - sugarwebnet
+    jenkins:
+        image: jenkinsci/blueocean
+        user: root
+        ports:
+            - 8081:8080
+        volumes:
+            - ./jenkins_home:/var/jenkins_home:z
+            - /var/run/docker.sock:/var/run/docker.sock
+            - ../:/home/sources
+            - /home/sources/ci
+        networks:
+            - sugarwebnet
+networks:
+    sugarwebnet:
