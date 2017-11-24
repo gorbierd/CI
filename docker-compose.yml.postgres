@@ -33,7 +33,7 @@ services:
             - ./jenkins_home:/var/jenkins_home:z
             - /var/run/docker.sock:/var/run/docker.sock
             - ../:/home/sources
-            - /home/sources/ci
+            - /home/sources/ci/
         networks:
             - sugarwebnet
 networks:
